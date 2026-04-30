@@ -1,6 +1,6 @@
 # Basket Craft — Merchandising Dashboard
 
-**Live app:** <!-- PASTE YOUR STREAMLIT CLOUD URL HERE AFTER DEPLOYING -->
+**Live app:** https://basket-craft-dashboard-qwqti6ccurbhwwmrvkw8hk.streamlit.app
 
 A Streamlit dashboard backed by Snowflake that answers Maya (Head of Merchandising) two core questions:
 - Which products drove the most revenue?
