@@ -53,13 +53,12 @@ def load_kpis() -> pd.DataFrame:
     return run_query("""
         WITH monthly AS (
             SELECT
-                DATE_TRUNC('MONTH', o.order_date)                                  AS month,
-                SUM(oi.line_total)                                                  AS revenue,
-                COUNT(DISTINCT o.order_id)                                          AS orders,
-                SUM(oi.quantity)                                                    AS items_sold,
-                ROUND(SUM(oi.line_total) / NULLIF(COUNT(DISTINCT o.order_id), 0), 2) AS aov
-            FROM orders o
-            JOIN order_items oi ON o.order_id = oi.order_id
+                DATE_TRUNC('MONTH', created_at)                                AS month,
+                SUM(price_usd)                                                 AS revenue,
+                COUNT(DISTINCT order_id)                                       AS orders,
+                SUM(items_purchased)                                           AS items_sold,
+                ROUND(SUM(price_usd) / NULLIF(COUNT(DISTINCT order_id), 0), 2) AS aov
+            FROM orders
             GROUP BY 1
             ORDER BY 1 DESC
             LIMIT 2
@@ -72,11 +71,10 @@ def load_kpis() -> pd.DataFrame:
 def load_trend(start: str, end: str) -> pd.DataFrame:
     return run_query("""
         SELECT
-            DATE_TRUNC('MONTH', o.order_date) AS month,
-            SUM(oi.line_total)                AS revenue
-        FROM orders o
-        JOIN order_items oi ON o.order_id = oi.order_id
-        WHERE o.order_date BETWEEN %s AND %s
+            DATE_TRUNC('MONTH', created_at) AS month,
+            SUM(price_usd)                  AS revenue
+        FROM orders
+        WHERE created_at BETWEEN %s AND %s
         GROUP BY 1
         ORDER BY 1
     """, (start, end))
@@ -87,11 +85,11 @@ def load_top_products(start: str, end: str) -> pd.DataFrame:
     return run_query("""
         SELECT
             p.product_name,
-            SUM(oi.line_total) AS revenue
+            SUM(oi.price_usd) AS revenue
         FROM order_items oi
         JOIN products p ON oi.product_id = p.product_id
         JOIN orders   o ON oi.order_id   = o.order_id
-        WHERE o.order_date BETWEEN %s AND %s
+        WHERE o.created_at BETWEEN %s AND %s
         GROUP BY 1
         ORDER BY 2 DESC
     """, (start, end))
