@@ -51,19 +51,16 @@ def run_query(sql: str, params: tuple = ()) -> pd.DataFrame:
 @st.cache_data(ttl=600)
 def load_kpis() -> pd.DataFrame:
     return run_query("""
-        WITH monthly AS (
-            SELECT
-                DATE_TRUNC('MONTH', created_at)                                AS month,
-                SUM(price_usd)                                                 AS revenue,
-                COUNT(DISTINCT order_id)                                       AS orders,
-                SUM(items_purchased)                                           AS items_sold,
-                ROUND(SUM(price_usd) / NULLIF(COUNT(DISTINCT order_id), 0), 2) AS aov
-            FROM orders
-            GROUP BY 1
-            ORDER BY 1 DESC
-            LIMIT 2
-        )
-        SELECT * FROM monthly ORDER BY month DESC
+        SELECT
+            DATE_TRUNC('MONTH', created_at)                                AS month,
+            SUM(price_usd)                                                 AS revenue,
+            COUNT(DISTINCT order_id)                                       AS orders,
+            SUM(items_purchased)                                           AS items_sold,
+            ROUND(SUM(price_usd) / NULLIF(COUNT(DISTINCT order_id), 0), 2) AS aov
+        FROM orders
+        GROUP BY 1
+        ORDER BY 1 DESC
+        LIMIT 2
     """)
 
 
